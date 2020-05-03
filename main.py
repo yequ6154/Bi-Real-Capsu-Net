@@ -22,7 +22,7 @@ parser.add_argument('--epochs', type=int, default=100, help='num of training epo
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
 parser.add_argument('--m_minus', type=float, default=0.1)
-parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 args = parser.parse_args()
 
@@ -47,7 +47,7 @@ def loss(x, recnstrcted, data, labels):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-workers = 4   # dataloder线程数
+workers = 0   # dataloder线程数
 
 test_flag = True  #测试标志，True时加载保存好的模型进行测试 
 log_dir = './fmnist_model.pth'  # 模型保存路径
