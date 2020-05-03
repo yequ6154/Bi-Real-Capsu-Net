@@ -50,7 +50,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 workers = 0   # dataloder线程数
 
 test_flag = True  #测试标志，True时加载保存好的模型进行测试 
-log_dir = './fmnist_model.pth'  # 模型保存路径
+log_dir = '/content/drive/My Drive/fmnist_model.pth'  # 模型保存路径
 
 def transform_matrix_offset_center(matrix, x, y):
     
