@@ -380,7 +380,8 @@ def train(train_loader, model, epoch):
 
         train_loss += loss_val
         loss_mean = train_loss / (i+1)
-        print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+        if i+1 % 100 == 0:
+          print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
         
 def main():
     # 如果test_flag=True,则加载已保存的模型
