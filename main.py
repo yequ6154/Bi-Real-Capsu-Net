@@ -17,7 +17,7 @@ import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description='PyTorch bi-real capsulenet' )
-parser.add_argument('--batch_size', type=int, default=64, help='batch size')
+parser.add_argument('--batch_size', type=int, default=256, help='batch size')
 parser.add_argument('--epochs', type=int, default=100, help='num of training epochs')
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
