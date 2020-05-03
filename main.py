@@ -369,7 +369,7 @@ def train(train_loader, model, epoch):
     #lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda1)
     train_loss = 0
     #for epoch in range(epochs):
-    for i, (data, label_) in enumerate(train_loader):
+    for batch_idx, (data, label_) in enumerate(train_loader):
         data, label = data.to(device), label_.to(device)
         labels = one_hot(label)
         optimizer.zero_grad()
@@ -377,11 +377,10 @@ def train(train_loader, model, epoch):
         loss_val = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
         loss_val.backward()
         optimizer.step()
-
-        train_loss += loss_val
-        loss_mean = train_loss / (i+1)
-        if i+1 % 100 == 0:
-          print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+        if batch_idx%100 == 0:
+          outputs, masked, recnstrcted, indices = model(data)
+          loss_val = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
+          print("epoch: ", epoch, "batch_idx: ", batch_idx, "loss: ", loss_val, "accuracy: ", accuracy(indices, label_.cpu())/indices.shape[0])
         
 def main():
     # 如果test_flag=True,则加载已保存的模型
