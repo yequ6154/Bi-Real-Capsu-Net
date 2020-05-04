@@ -128,7 +128,8 @@ def train(train_loader, model):
         data, label = data.to(device), label_.to(device)
         labels = one_hot(label)
         optimizer.zero_grad()
-        outputs, masked, recnstrcted, indices = model(data, labels)
+        with torch.no_grad():
+          outputs, masked, recnstrcted, indices = model(data, labels)
         loss_val = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
         loss_val.backward()
         optimizer.step()
