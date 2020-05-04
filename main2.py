@@ -87,22 +87,23 @@ def accuracy(indices, labels):
 def test(model, test_loader, loss, lamda=0.5, m_plus=0.9, m_minus=0.1):
   test_loss = 0.0
   correct = 0.0
-  for batch_idx, (data, label) in enumerate(test_loader):
-    data, labels = data.to(device), one_hot(label.to(device))
-    outputs, masked_output, recnstrcted, indices = model(data)
-#     if batch_idx == 9:
-#       print("test: ", indices)
-    loss_test = model.loss(outputs, recnstrcted, data, labels, lamda, m_plus, m_minus)
-    test_loss += loss_test.data
-    indices_cpu, labels_cpu = indices.cpu(), label.cpu()
-#     for i in range(indices_cpu.shape[0]):
-#         if float(indices_cpu[i]) == labels_cpu[i]:
-#             correct += 1
-    correct += accuracy(indices_cpu, labels_cpu)
-#     if batch_idx % 100 == 0:
-#        print("batch: ", batch_idx, "accuracy: ", correct/len(test_loader.dataset))
-#         print(indices_cpu)
-  print("\nTest Loss: ", test_loss/len(test_loader.dataset), "; Test Accuracy: " , correct/len(test_loader.dataset) * 100,'\n')
+  with torch.no_grad():
+    for batch_idx, (data, label) in enumerate(test_loader):
+      data, labels = data.to(device), one_hot(label.to(device))
+      outputs, masked_output, recnstrcted, indices = model(data)
+  #     if batch_idx == 9:
+  #       print("test: ", indices)
+      loss_test = model.loss(outputs, recnstrcted, data, labels, lamda, m_plus, m_minus)
+      test_loss += loss_test.data
+      indices_cpu, labels_cpu = indices.cpu(), label.cpu()
+  #     for i in range(indices_cpu.shape[0]):
+  #         if float(indices_cpu[i]) == labels_cpu[i]:
+  #             correct += 1
+      correct += accuracy(indices_cpu, labels_cpu)
+  #     if batch_idx % 100 == 0:
+  #        print("batch: ", batch_idx, "accuracy: ", correct/len(test_loader.dataset))
+  #         print(indices_cpu)
+    print("\nTest Loss: ", test_loss/len(test_loader.dataset), "; Test Accuracy: " , correct/len(test_loader.dataset) * 100,'\n')
 
 
 log_dir = '/content/drive/My Drive/cifar_model.pth'  # 模型保存路径
