@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser(description='PyTorch bi-real capsulenet' )
 parser.add_argument('--batch_size', type=int, default=256, help='batch size')
 parser.add_argument('--epochs', type=int, default=100, help='num of training epochs')
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
+parser.add_argument('--learningrate', type=float, default=0.01, help='optimize learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
 parser.add_argument('--m_minus', type=float, default=0.1)
 parser.add_argument('-j', '--workers', default=0, type=int, metavar='N',
@@ -337,7 +338,7 @@ test_loader = torch.utils.data.DataLoader(datasets.FashionMNIST(root='./data1/',
 
 
 model = Model().to(device)
-optimizer = torch.optim.Adam(model.parameters(), 0.001)
+optimizer = torch.optim.Adam(model.parameters(), args.learningrate)
 
 
 def accuracy(indices, labels):
