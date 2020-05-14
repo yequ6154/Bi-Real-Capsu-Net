@@ -375,9 +375,9 @@ if __name__ == '__main__':
                     loss_mean = train_loss / (i+1)   
                     
                     print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}\t Acc:{:.6f}'.format(epoch, i + 1, loss_mean.item(), accuracy(indices, label_.cpu())/indices.shape[0]))
-                    f2.write('%03d  %05d |Loss: %.03f | Acc: %.3f%% '
+                    f2.write('%03d  %05d |Loss: %.03f | Acc: %.3f%% \n'
                           % (epoch, (i + 1 + epoch * length), loss_mean.item(), accuracy(indices, label_.cpu())/indices.shape[0])
-                    f2.write('\n')
+                    #f2.write('\n')
                     f2.flush()            
                     
                 # 每训练完一个epoch测试一下准确率
