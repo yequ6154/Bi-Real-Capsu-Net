@@ -198,7 +198,7 @@ class Attention(nn.Module):
         
         x = self.ca1(x) * x
         x = self.sa1(x) * x
-        x = self.avgpool(x)
+        x = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
          
         width = x.shape[2]
         x = x.view(inputs.shape[0], self.ch_j, self.n_j, width, width)
