@@ -176,10 +176,7 @@ class Attention(nn.Module):
         self.ch_i = ch_i
         self.n_i = n_i
         self.ch_j = ch_j
-        self.n_j = n_j
-        self.kernel_size = kernel_size
-        self.stride = stride
-        self.r_num = r_num        
+        self.n_j = n_j      
         in_channels = self.ch_i * self.n_i
         out_channels = self.ch_j * self.n_j
      
