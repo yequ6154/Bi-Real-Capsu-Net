@@ -23,7 +23,7 @@ parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
 parser.add_argument('--m_minus', type=float, default=0.1)
-parser.add_argument('--log_dir', type=str, default='./fmnist_modelA.pth')
+parser.add_argument('--log_dir', type=str, default='/content/drive/My Drive/fmnist_modelA.pth')
 parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
 args = parser.parse_args()
@@ -407,7 +407,7 @@ if __name__ == '__main__':
                         f3.close()
                         best_acc = acc
                         statebest = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
-                        logdir = './fmnist_bestmodelA.pth'
+                        logdir = '/content/drive/My Drive/fmnist_bestmodelA.pth'
                         torch.save(statebest, logdir)  
                 print('Saving model......')        
                 state = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
