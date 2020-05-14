@@ -359,8 +359,7 @@ if __name__ == '__main__':
                 print('无保存模型，将从头开始训练！')
         
             for epoch in range(start_epoch+1, args.epochs+1):
-                train_loss = 0
-                correct = 0
+                train_loss = 0             
                 total = 0
                 for i, (data, label_) in enumerate(train_loader):
                     data, label = data.to(device), label_.to(device)
@@ -372,15 +371,12 @@ if __name__ == '__main__':
                     loss_val.backward()
                     optimizer.step()
                     
-                    train_loss += loss_val
-                    _, predicted = torch.max(indices.data, 1)
-                    correct += predicted.eq(label.data).cpu().sum()
-                    total +=label.size(0)
+                    train_loss += loss_val                   
                     loss_mean = train_loss / (i+1)   
                     
-                    print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+                    print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}\t Acc:{:.6f}'.format(epoch, i + 1, loss_mean.item(), accuracy(indices, label_.cpu())/indices.shape[0]))
                     f2.write('%03d  %05d |Loss: %.03f | Acc: %.3f%% '
-                          % (epoch, (i + 1 + epoch * length), train_loss / (i + 1), 100. * correct / total))
+                          % (epoch, (i + 1 + epoch * length), loss_mean.item(), accuracy(indices, label_.cpu())/indices.shape[0])
                     f2.write('\n')
                     f2.flush()            
                     
