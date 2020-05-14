@@ -375,7 +375,7 @@ if __name__ == '__main__':
                     train_loss += loss_val
                     indices_cpu, labels_cpu = indices.cpu(), label.cpu()
                     correct += accuracy(indices_cpu, labels_cpu)
-                    total = len(train_loader.dataset)
+                    total += label.size(0)
                     loss_mean = train_loss / (i+1)   
                     
                     print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
