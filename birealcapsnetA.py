@@ -186,7 +186,7 @@ class Attention(nn.Module):
         self.sa1 = SpatialAttention()
 
         #self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
         
     def forward(self, inputs):
         # check if happened properly
