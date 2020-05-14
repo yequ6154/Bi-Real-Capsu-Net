@@ -18,7 +18,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='PyTorch bi-real capsulenet' )
 parser.add_argument('--batch_size', type=int, default=256, help='batch size')
-parser.add_argument('--epochs', type=int, default=120, help='num of training epochs')
+parser.add_argument('--epochs', type=int, default=200, help='num of training epochs')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
@@ -373,9 +373,9 @@ if __name__ == '__main__':
                     optimizer.step()
                     
                     train_loss += loss_val
-                    indices_cpu, labels_cpu = indices.cpu(), label.cpu()
-                    correct += accuracy(indices_cpu, labels_cpu)
-                    total += label.size(0)
+                    _, predicted = torch.max(indices.data, 1)
+                    correct += predicted.eq(label.data).cpu().sum()
+                    total +=label.size(0)
                     loss_mean = train_loss / (i+1)   
                     
                     print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
