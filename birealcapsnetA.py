@@ -494,7 +494,7 @@ class Model(nn.Module):
         self.batchNorm = torch.nn.BatchNorm2d(num_features=128, eps=1e-08, momentum=0.99)
         self.ca = ChannelAttention(128)
         self.sa = SpatialAttention()
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
         
         self.toCaps = ConvertToCaps()
         
