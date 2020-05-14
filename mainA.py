@@ -346,8 +346,8 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(datasets.FashionMNIST(root='./data1/',train=False,download=True,transform=transforms.ToTensor()),batch_size = args.batch_size,shuffle=True, num_workers=args.workers)
     best_acc = 85  # 初始化best test accuracy
     print("Start Training!")  # 定义遍历数据集的次数
-    with open("test_acc.txt", "w") as f:
-        with open("train_log.txt", "w")as f2:
+    with open("/content/drive/My Drive/test_acc.txt", "w") as f:
+        with open("/content/drive/My Drive/train_log.txt", "w")as f2:
             if os.path.exists(args.log_dir):
                 checkpoint = torch.load(args.log_dir)
                 model.load_state_dict(checkpoint['model'])
@@ -404,7 +404,7 @@ if __name__ == '__main__':
                     f.write('\n')
                     f.flush()                    
                     if acc > best_acc:
-                        f3 = open("bestA_acc.txt", "w")
+                        f3 = open("/content/drive/My Drive/bestA_acc.txt", "w")
                         f3.write("EPOCH=%d,best_acc= %.3f%%" % (epoch, acc))
                         f3.close()
                         best_acc = acc
