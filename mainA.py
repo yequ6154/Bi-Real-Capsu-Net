@@ -360,6 +360,8 @@ if __name__ == '__main__':
         
             for epoch in range(start_epoch+1, args.epochs+1):
                 train_loss = 0
+                correct = 0
+                total = 0
                 for i, (data, label_) in enumerate(train_loader):
                     data, label = data.to(device), label_.to(device)
                     labels = one_hot(label)
@@ -386,7 +388,7 @@ if __name__ == '__main__':
                 print("Waiting Test!")                  
                 with torch.no_grad():
                     test_loss = 0.0
-                    correct = 0.0
+                    correct = 0
                     for i, (data, label) in enumerate(test_loader):
                         data, labels = data.to(device), one_hot(label.to(device))
                         optimizer.zero_grad()
