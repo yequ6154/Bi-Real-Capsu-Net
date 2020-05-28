@@ -342,6 +342,8 @@ def accuracy(indices, labels):
 if __name__ == '__main__':
     model = Model().to(device)
     optimizer = torch.optim.Adam(model.parameters(), args.lr)
+    lambda1 = lambda epoch: 0.5**(epoch // 10)
+    lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda1)
     train_loader = torch.utils.data.DataLoader(datasets.FashionMNIST(root='./data1/',train=True,download=True,transform=trans(rotation_range=0.1, translation_range=0.1, zoom_range=(0.1, 0.2))),batch_size = args.batch_size,shuffle=True, num_workers=args.workers)
     test_loader = torch.utils.data.DataLoader(datasets.FashionMNIST(root='./data1/',train=False,download=True,transform=transforms.ToTensor()),batch_size = args.batch_size,shuffle=True, num_workers=args.workers)
     best_acc = 85  # 初始化best test accuracy
@@ -373,10 +375,11 @@ if __name__ == '__main__':
                     optimizer.step()
                     
                     train_loss += loss_val                                                        
-                    loss_mean = train_loss / (i+1)                       
-                    print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+                    loss_mean = train_loss / (i+1)
+                    acc = accuracy(indices, label_.cpu())/indices.shape[0]
+                    print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item(), acc))
                     f2.write('%03d  %05d |Loss: %.03f | Acc: %.3f%% '
-                          % (epoch, (i + 1 + epoch * length), loss_mean, accuracy(indices, label_.cpu())/indices.shape[0])
+                          % (epoch, (i + 1 + epoch * length), loss_mean, acc)
                     f2.write('\n')
                     f2.flush()            
                     
@@ -410,11 +413,5 @@ if __name__ == '__main__':
                 print('Saving model......')        
                 state = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
                 torch.save(state, args.log_dir)   
-                
+                lr_scheduler.step()
             print("Training and Test are Finished, Toralepoch=%d" % args.epochs)    
-                
-                
-               
-
-
-
