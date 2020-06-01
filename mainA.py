@@ -12,7 +12,6 @@ from torchvision import datasets, transforms
 import pandas as pd
 import numpy as np
 import math
-from torch.utils.tensorboard import SummaryWriter
 from birealcapsnetA import *
 import scipy.ndimage as ndi
 import numpy as np
@@ -20,7 +19,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='PyTorch bi-real capsulenet' )
 parser.add_argument('--batch_size', type=int, default=256, help='batch size')
-parser.add_argument('--epochs', type=int, default=120, help='num of training epochs')
+parser.add_argument('--epochs', type=int, default=100, help='num of training epochs')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--lamda', type=float, default=0.5, help='learning rate')
 parser.add_argument('--m_plus', type=float, default=0.9)
@@ -49,10 +48,6 @@ def loss(x, recnstrcted, data, labels):
         return loss_.mean()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-test_flag = True  #测试标志，True时加载保存好的模型进行测试 
-
 
 def transform_matrix_offset_center(matrix, x, y):
     
@@ -360,12 +355,6 @@ if __name__ == '__main__':
     else:
         start_epoch = 0
         print('无保存模型，将从头开始训练！')
-    images, labels = next(iter(train_loader))
-    grid = torchvision.utils.make_grid(images)
-    images = images.to(device)
-    tb = SummaryWriter()
-    tb.add_image('images', grid)
-    tb.add_graph(model, images)
     
     for epoch in range(start_epoch+1, args.epochs+1):
     
@@ -385,14 +374,7 @@ if __name__ == '__main__':
             
             train_loss += loss_val.item()                                                        
             loss_mean = train_loss / (i+1)
-            
-            tb.add_scalar('Loss', train_loss, epoch)
-            tb.add_scalar('Loss_mean', loss_mean, epoch)      
-          
-            for name, weight in model.named_parameters():
-                tb.add_histogram(name, weight, epoch)
-                tb.add_histogram(f'{name}.grad', weight.grad, epoch)
-            
+     
             print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean))
                      
             
@@ -426,5 +408,4 @@ if __name__ == '__main__':
         state = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
         torch.save(state, args.log_dir)   
         lr_scheduler.step()
-    print("Training and Test are Finished, Toralepoch=%d" % args.epochs)    
-    tb.close()
+    print("Training and Test are Finished, Toralepoch=%d" % args.epochs)   
