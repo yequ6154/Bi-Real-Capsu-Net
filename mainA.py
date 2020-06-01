@@ -362,7 +362,7 @@ if __name__ == '__main__':
         print('无保存模型，将从头开始训练！')
     images, labels = next(iter(train_loader))
     grid = torchvision.utils.make_grid(images)
-
+    images = images.to(device)
     tb = SummaryWriter()
     tb.add_image('images', grid)
     tb.add_graph(model, images)
