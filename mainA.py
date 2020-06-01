@@ -426,3 +426,4 @@ if __name__ == '__main__':
         torch.save(state, args.log_dir)   
         lr_scheduler.step()
     print("Training and Test are Finished, Toralepoch=%d" % args.epochs)    
+    tb.close()
