@@ -11,6 +11,7 @@ from torchvision import datasets, transforms
 import pandas as pd
 import numpy as np
 import math
+from torch.utils.tensorboard import SummaryWriter
 from birealcapsnetA import *
 import scipy.ndimage as ndi
 import numpy as np
@@ -348,75 +349,80 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(datasets.FashionMNIST(root='./data1/',train=False,download=True,transform=transforms.ToTensor()),batch_size = args.batch_size,shuffle=True, num_workers=args.workers)
     best_acc = 85  # 初始化best test accuracy
     print("Start Training!")  # 定义遍历数据集的次数
-    with open("/content/drive/My Drive/test_acc.txt", "w") as f:
-        with open("/content/drive/My Drive/train_log.txt", "w")as f2:
-            if os.path.exists(args.log_dir):
-                checkpoint = torch.load(args.log_dir)
-                model.load_state_dict(checkpoint['model'])
-                optimizer.load_state_dict(checkpoint['optimizer'])
-                start_epoch = checkpoint['epoch']
-                print('加载 epoch {} 成功！'.format(start_epoch))
-            else:
-                start_epoch = 0
-                print('无保存模型，将从头开始训练！')
-        
-            for epoch in range(start_epoch+1, args.epochs+1):
-                train_loss = 0
-                correct = 0
-                total = 0
-                for i, (data, label_) in enumerate(train_loader):
-                    data, label = data.to(device), label_.to(device)
-                    labels = one_hot(label)
-                    length = len(train_loader)
-                    optimizer.zero_grad()
-                    outputs, masked, recnstrcted, indices = model(data, labels)
-                    loss_val = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
-                    loss_val.backward()
-                    optimizer.step()
-                    
-                    train_loss += loss_val                                                        
-                    loss_mean = train_loss / (i+1)                       
-                    print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
-                    f2.write('%03d  %05d |Loss: %.03f | Acc: %.3f%% '
-                          % (epoch, (i + 1 + epoch * length), loss_mean, accuracy(indices, label_.cpu())/indices.shape[0])
-                    f2.write('\n')
-                    f2.flush()            
-                    
-                # 每训练完一个epoch测试一下准确率
-                print("Waiting Test!")                  
-                with torch.no_grad():
-                    test_loss = 0.0
-                    correct = 0
-                    for i, (data, label) in enumerate(test_loader):
-                        data, labels = data.to(device), one_hot(label.to(device))
-                        optimizer.zero_grad()
-                        outputs, masked_output, recnstrcted, indices = model(data)
-                        loss_test = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
-                        test_loss += loss_test.data
-                        indices_cpu, labels_cpu = indices.cpu(), label.cpu()
-                        correct += accuracy(indices_cpu, labels_cpu)
-                    test_loss /= (i + 1)
-                    acc = correct/len(test_loader.dataset) * 100.
-                    print("\nAverage Test Loss: ", test_loss, "; Test Accuracy: " , acc,'\n')
-                    f.write("EPOCH=%03d,Accuracy= %.3f%%" % (epoch, acc))
-                    f.write('\n')
-                    f.flush()                    
-                    if acc > best_acc:
-                        f3 = open("bestA_acc.txt", "w")
-                        f3.write("EPOCH=%d,best_acc= %.3f%%" % (epoch, acc))
-                        f3.close()
-                        best_acc = acc
-                        statebest = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
-                        logdir = '/content/drive/My Drive/fmnist_bestmodelA.pth'
-                        torch.save(statebest, logdir)  
-                print('Saving model......')        
-                state = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
-                torch.save(state, args.log_dir)   
-                lr_scheduler.step()
-            print("Training and Test are Finished, Toralepoch=%d" % args.epochs)    
-                
-                
-               
+    
+    if os.path.exists(args.log_dir):
+        checkpoint = torch.load(args.log_dir)
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        start_epoch = checkpoint['epoch']
+        print('加载 epoch {} 成功！'.format(start_epoch))
+    else:
+        start_epoch = 0
+        print('无保存模型，将从头开始训练！')
+    images, labels = next(iter(train_loader))
+    grid = torchvision.utils.make_grid(images)
 
+    tb = SummaryWriter()
+    tb.add_image('images', grid)
+    tb.add_graph(model, images)
+    
+    for epoch in range(start_epoch+1, args.epochs+1):
+    
+        train_loss = 0
+        correct = 0
+        total = 0
+        for i, (data, label_) in enumerate(train_loader):
 
-
+            data, label = data.to(device), label_.to(device)
+            labels = one_hot(label)
+            length = len(train_loader)
+            optimizer.zero_grad()
+            outputs, masked, recnstrcted, indices = model(data, labels)
+            loss_val = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
+            loss_val.backward()
+            optimizer.step()
+            
+            train_loss += loss_val.item()                                                        
+            loss_mean = train_loss / (i+1)
+            
+            tb.add_scalar('Loss', train_loss, epoch)
+            tb.add_scalar('Loss_mean', loss_mean, epoch)      
+          
+            for name, weight in model.named_parameters():
+                tb.add_histogram(name, weight, epoch)
+                tb.add_histogram(f'{name}.grad', weight.grad, epoch)
+            
+            print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+                     
+            
+        # 每训练完一个epoch测试一下准确率
+        print("Waiting Test!")                  
+        with torch.no_grad():
+            model.eval()
+            test_loss = 0.0
+            correct = 0
+            for i, (data, label) in enumerate(test_loader):
+                data, labels = data.to(device), one_hot(label.to(device))
+                optimizer.zero_grad()
+                outputs, masked_output, recnstrcted, indices = model(data)
+                loss_test = model.loss(outputs, recnstrcted, data, labels, args.lamda, args.m_plus, args.m_minus)
+                test_loss += loss_test.data
+                indices_cpu, labels_cpu = indices.cpu(), label.cpu()
+                correct += accuracy(indices_cpu, labels_cpu)
+            test_loss /= (i + 1)
+            acc = correct/len(test_loader.dataset) * 100.
+            print("\nAverage Test Loss: ", test_loss, "; Test Accuracy: " , acc,'\n')
+                             
+            if acc > best_acc:
+                f3 = open("bestA_acc.txt", "w")
+                f3.write("EPOCH=%d,best_acc= %.3f%%" % (epoch, acc))
+                f3.close()
+                best_acc = acc
+                statebest = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
+                logdir = '/content/drive/My Drive/fmnist_bestmodelA.pth'
+                torch.save(statebest, logdir)  
+        print('Saving model......')        
+        state = {'model':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
+        torch.save(state, args.log_dir)   
+        lr_scheduler.step()
+    print("Training and Test are Finished, Toralepoch=%d" % args.epochs)    
