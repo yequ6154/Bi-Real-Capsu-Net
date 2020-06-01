@@ -2,6 +2,7 @@ import torch
 import random
 import os
 import torch.nn as nn
+import torchvision
 import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
 import torch.nn.functional as func
