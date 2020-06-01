@@ -393,7 +393,7 @@ if __name__ == '__main__':
                 tb.add_histogram(name, weight, epoch)
                 tb.add_histogram(f'{name}.grad', weight.grad, epoch)
             
-            print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean.item()))
+            print('Train Epoch: {}\t Train nums: {}\t Loss: {:.6f}'.format(epoch, i + 1, loss_mean))
                      
             
         # 每训练完一个epoch测试一下准确率
